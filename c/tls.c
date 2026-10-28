@@ -241,6 +241,7 @@ int tlsSocketInit2(TlsEnvironment *env, TlsSocket **outSocket, int fd, bool isSe
                   : env->settings->label;
   char *ciphers = env->settings->ciphers;
   char *keyshares = env->settings->keyshares;
+  int sessionType = isServer ? GSK_SERVER_SESSION_WITH_CL_AUTH : GSK_CLIENT_SESSION;
   /* As in tlsInit(): run each GSK call only while rc is 0, and keep the failing status. */
   rc = rc ? rc : gsk_secure_socket_open(env->envHandle, &socket->socketHandle);
   rc = rc ? rc : gsk_attribute_set_numeric_value(socket->socketHandle, GSK_FD, fd);
@@ -252,7 +253,7 @@ int tlsSocketInit2(TlsEnvironment *env, TlsSocket **outSocket, int fd, bool isSe
     rc = rc ? rc : gsk_attribute_set_buffer(socket->socketHandle, GSK_V3_CIPHER_SPECS_EXPANDED, ciphers, 0);
     rc = rc ? rc : gsk_attribute_set_enum(socket->socketHandle, GSK_V3_CIPHERS, GSK_V3_CIPHERS_CHAR4);
   }
-  rc = rc ? rc : gsk_attribute_set_enum(socket->socketHandle, GSK_SESSION_TYPE, isServer ? GSK_SERVER_SESSION_WITH_CL_AUTH : GSK_CLIENT_SESSION);
+  rc = rc ? rc : gsk_attribute_set_enum(socket->socketHandle, GSK_SESSION_TYPE, sessionType);
 
   int tlsMin = getTlsMin(env->settings);
   int tlsMax = getTlsMax(env->settings);
